@@ -69,6 +69,14 @@ func OptionPrefixTextColor(x Color) Option {
 	}
 }
 
+// OptionPrefixTextBold change a text bold style
+func OptionPrefixTextBold(v bool) Option {
+	return func(p *Prompt) error {
+		p.renderer.prefixTextBold = v
+		return nil
+	}
+}
+
 // OptionPrefixBackgroundColor to change a background color of prefix string
 func OptionPrefixBackgroundColor(x Color) Option {
 	return func(p *Prompt) error {
@@ -81,6 +89,14 @@ func OptionPrefixBackgroundColor(x Color) Option {
 func OptionInputTextColor(x Color) Option {
 	return func(p *Prompt) error {
 		p.renderer.inputTextColor = x
+		return nil
+	}
+}
+
+// OptionInputTextBold to change the bold style of text which is input by user
+func OptionInputTextBold(v bool) Option {
+	return func(p *Prompt) error {
+		p.renderer.inputTextBold = v
 		return nil
 	}
 }

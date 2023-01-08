@@ -21,8 +21,10 @@ type Render struct {
 
 	// colors,
 	prefixTextColor              Color
+	prefixTextBold               bool
 	prefixBGColor                Color
 	inputTextColor               Color
+	inputTextBold                bool
 	inputBGColor                 Color
 	previewSuggestionTextColor   Color
 	previewSuggestionBGColor     Color
@@ -56,7 +58,7 @@ func (r *Render) getCurrentPrefix() string {
 }
 
 func (r *Render) renderPrefix() {
-	r.out.SetColor(r.prefixTextColor, r.prefixBGColor, false)
+	r.out.SetColor(r.prefixTextColor, r.prefixBGColor, r.prefixTextBold)
 	r.out.WriteStr(r.getCurrentPrefix())
 	r.out.SetColor(DefaultColor, DefaultColor, false)
 }
@@ -194,7 +196,7 @@ func (r *Render) Render(buffer *Buffer, completion *CompletionManager) {
 	defer r.out.ShowCursor()
 
 	r.renderPrefix()
-	r.out.SetColor(r.inputTextColor, r.inputBGColor, false)
+	r.out.SetColor(r.inputTextColor, r.inputBGColor, r.inputTextBold)
 	r.out.WriteStr(line)
 	r.out.SetColor(DefaultColor, DefaultColor, false)
 	r.lineWrap(cursor)
