@@ -2,7 +2,6 @@ package prompt
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"time"
 
@@ -171,7 +170,6 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, exec *Exec) {
 }
 
 func (p *Prompt) handleCompletionKeyBinding(key Key, completing bool) {
-	debug.Log(fmt.Sprintf("handleCompletionKeyBinding: %t (key:%s)", completing, key.String()))
 	switch key {
 	case Down:
 		if completing || p.completionOnDown {
