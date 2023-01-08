@@ -120,6 +120,11 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, exec *Exec) {
 	completing := p.completion.Completing()
 	p.handleCompletionKeyBinding(key, completing)
 
+	shouldExit = p.handleKeyBinding(key)
+	if shouldExit {
+		return
+	}
+
 	switch key {
 	case Enter, ControlJ, ControlM:
 		p.renderer.BreakLine(p.buf)
@@ -133,11 +138,6 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, exec *Exec) {
 		p.renderer.BreakLine(p.buf)
 		p.buf = NewBuffer()
 		p.history.Clear()
-		shouldExit = true
-		return
-
-	case Escape:
-		shouldExit = true
 		return
 
 	case Up, ControlP:
@@ -164,8 +164,6 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, exec *Exec) {
 		}
 		p.buf.InsertText(string(b), false, true)
 	}
-
-	shouldExit = p.handleKeyBinding(key)
 	return
 }
 

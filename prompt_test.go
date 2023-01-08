@@ -15,10 +15,17 @@ func completer(in Document) []Suggest {
 	return FilterFuzzy(s, in.Text, false)
 }
 
+func ExitCheckerFn(key Key, in string, breakline bool) bool {
+	switch key {
+	case Escape:
+		return true
+	}
+	return false
+}
+
 func TestPrompt_Input(t *testing.T) {
 	in := Input(">>> ", completer,
 		OptionTitle("sql-prompt"),
-
 		OptionPrefixTextColor(Yellow),
 		OptionCompletionOnDown(),
 		OptionPreviewSuggestionTextColor(Blue),
@@ -26,6 +33,7 @@ func TestPrompt_Input(t *testing.T) {
 		OptionSuggestionBGColor(DarkGray),
 		OptionScrollbarThumbColor(Purple),
 		OptionScrollbarBGColor(DarkGray),
+		OptionSetExitCheckerOnInput(ExitCheckerFn),
 	)
 	fmt.Println("Your input: " + in)
 }
