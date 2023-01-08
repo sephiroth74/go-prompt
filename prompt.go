@@ -2,6 +2,7 @@ package prompt
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"time"
 
@@ -16,7 +17,7 @@ type Executor func(string)
 // - immediate exit (if breakline is false) without executor called
 // - exit after typing <return> (meaning breakline is true), and the executor is called first, before exit.
 // Exit means exit go-prompt (not the overall Go program)
-type ExitChecker func(in string, breakline bool) bool
+type ExitChecker func(key Key, in string, breakline bool) bool
 
 // Completer should return the suggest item from Document.
 type Completer func(Document) []Suggest
@@ -38,6 +39,7 @@ type Prompt struct {
 }
 
 // Exec is the struct contains user input context.
+
 type Exec struct {
 	input string
 }
@@ -87,7 +89,7 @@ func (p *Prompt) Run() {
 
 				p.renderer.Render(p.buf, p.completion)
 
-				if p.exitChecker != nil && p.exitChecker(e.input, true) {
+				if p.exitChecker != nil && p.exitChecker(p.buf.lastKeyStroke, e.input, true) {
 					p.skipTearDown = true
 					return
 				}
@@ -132,6 +134,13 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, exec *Exec) {
 		p.renderer.BreakLine(p.buf)
 		p.buf = NewBuffer()
 		p.history.Clear()
+		shouldExit = true
+		return
+
+	case Escape:
+		shouldExit = true
+		return
+
 	case Up, ControlP:
 		if !completing { // Don't use p.completion.Completing() because it takes double operation when switch to selected=-1.
 			if newBuf, changed := p.history.Older(p.buf); changed {
@@ -162,6 +171,7 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, exec *Exec) {
 }
 
 func (p *Prompt) handleCompletionKeyBinding(key Key, completing bool) {
+	debug.Log(fmt.Sprintf("handleCompletionKeyBinding: %t (key:%s)", completing, key.String()))
 	switch key {
 	case Down:
 		if completing || p.completionOnDown {
@@ -212,7 +222,7 @@ func (p *Prompt) handleKeyBinding(key Key) bool {
 			kb.Fn(p.buf)
 		}
 	}
-	if p.exitChecker != nil && p.exitChecker(p.buf.Text(), false) {
+	if p.exitChecker != nil && p.exitChecker(p.buf.lastKeyStroke, p.buf.Text(), false) {
 		shouldExit = true
 	}
 	return shouldExit

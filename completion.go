@@ -1,6 +1,7 @@
 package prompt
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/c-bata/go-prompt/internal/debug"
@@ -83,6 +84,12 @@ func (c *CompletionManager) Next() {
 		c.verticalScroll++
 	}
 	c.selected++
+
+	if c.selected >= len(c.tmp) {
+		c.selected = 0
+		c.verticalScroll = 0
+	}
+
 	c.update()
 }
 
@@ -97,7 +104,9 @@ func (c *CompletionManager) update() {
 		max = len(c.tmp)
 	}
 
-	if c.selected >= len(c.tmp) {
+	debug.Log(fmt.Sprintf("max:%d, total:%d, selected:%d, scroll:%d", max, len(c.tmp), c.selected, c.verticalScroll))
+
+	if c.verticalScroll >= len(c.tmp) || c.selected >= len(c.tmp) {
 		c.Reset()
 	} else if c.selected < -1 {
 		c.selected = len(c.tmp) - 1
